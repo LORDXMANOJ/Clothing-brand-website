@@ -5,6 +5,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
+const { apiLimiter } = require('./middleware/rateLimiter');
 
 const authRoutes = require('./routes/authRoutes');
 const itemRoutes = require('./routes/itemRoutes');
@@ -19,6 +20,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/api', apiLimiter);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
