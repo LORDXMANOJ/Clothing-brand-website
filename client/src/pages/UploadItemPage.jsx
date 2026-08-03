@@ -16,24 +16,66 @@ export const UploadItemPage = () => {
     imageUrl: 'https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=800&q=80',
     tags: 'uniqlo, airism, minimalist',
   });
+
+  const [fieldErrors, setFieldErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    if (fieldErrors[name]) {
+      setFieldErrors({ ...fieldErrors, [name]: '' });
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    const urlRegex = /^https?:\/\/.+/i;
+
+    if (!formData.title || formData.title.trim().length < 5) {
+      errors.title = 'Title must be at least 5 characters long';
+    }
+
+    if (!formData.brand || !formData.brand.trim()) {
+      errors.brand = 'Brand is required';
+    }
+
+    if (!formData.description || formData.description.trim().length < 20) {
+      errors.description = 'Description must be at least 20 characters long';
+    }
+
+    const val = Number(formData.estimatedValue);
+    if (isNaN(val) || val <= 0) {
+      errors.estimatedValue = 'Estimated value must be a positive number greater than 0';
+    }
+
+    if (!formData.imageUrl || !urlRegex.test(formData.imageUrl.trim())) {
+      errors.imageUrl = 'Please enter a valid HTTP or HTTPS image URL';
+    }
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
+
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const tagArray = formData.tags ? formData.tags.split(',').map((t) => t.trim()) : [];
       await itemService.createItem({
         ...formData,
-        images: [formData.imageUrl],
+        estimatedValue: Number(formData.estimatedValue),
+        images: [formData.imageUrl.trim()],
         tags: tagArray,
       });
       navigate('/marketplace');
@@ -62,34 +104,45 @@ export const UploadItemPage = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+          {/* Title */}
           <div>
             <label className="block font-semibold text-gray-700 mb-1">Item Title</label>
             <input
               type="text"
               name="title"
-              required
               value={formData.title}
               onChange={handleChange}
               placeholder="e.g. Levi's Trucker Denim Jacket or Zara Midi Dress"
-              className="w-full border border-gray-300 rounded p-2 text-xs focus:outline-none focus:border-gray-500"
+              className={`w-full border rounded p-2 text-xs focus:outline-none ${
+                fieldErrors.title ? 'border-rose-400 bg-rose-50/50' : 'border-gray-300 focus:border-gray-500'
+              }`}
             />
+            {fieldErrors.title && (
+              <p className="text-rose-600 text-[11px] mt-1 font-medium">{fieldErrors.title}</p>
+            )}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Brand */}
             <div>
               <label className="block font-semibold text-gray-700 mb-1">Brand</label>
               <input
                 type="text"
                 name="brand"
-                required
                 value={formData.brand}
                 onChange={handleChange}
                 placeholder="e.g. Levi's, Nike, Zara, H&M, Uniqlo"
-                className="w-full border border-gray-300 rounded p-2 text-xs focus:outline-none focus:border-gray-500"
+                className={`w-full border rounded p-2 text-xs focus:outline-none ${
+                  fieldErrors.brand ? 'border-rose-400 bg-rose-50/50' : 'border-gray-300 focus:border-gray-500'
+                }`}
               />
+              {fieldErrors.brand && (
+                <p className="text-rose-600 text-[11px] mt-1 font-medium">{fieldErrors.brand}</p>
+              )}
             </div>
 
+            {/* Category */}
             <div>
               <label className="block font-semibold text-gray-700 mb-1">Category</label>
               <select
@@ -110,6 +163,7 @@ export const UploadItemPage = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* Size */}
             <div>
               <label className="block font-semibold text-gray-700 mb-1">Size</label>
               <select
@@ -130,6 +184,7 @@ export const UploadItemPage = () => {
               </select>
             </div>
 
+            {/* Condition */}
             <div>
               <label className="block font-semibold text-gray-700 mb-1">Condition</label>
               <select
@@ -145,6 +200,7 @@ export const UploadItemPage = () => {
               </select>
             </div>
 
+            {/* Estimated Value */}
             <div>
               <label className="block font-semibold text-gray-700 mb-1">Est. Value ($)</label>
               <input
@@ -152,39 +208,56 @@ export const UploadItemPage = () => {
                 name="estimatedValue"
                 value={formData.estimatedValue}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded p-2 text-xs focus:outline-none"
+                className={`w-full border rounded p-2 text-xs focus:outline-none ${
+                  fieldErrors.estimatedValue ? 'border-rose-400 bg-rose-50/50' : 'border-gray-300 focus:border-gray-500'
+                }`}
               />
+              {fieldErrors.estimatedValue && (
+                <p className="text-rose-600 text-[11px] mt-1 font-medium">{fieldErrors.estimatedValue}</p>
+              )}
             </div>
           </div>
 
+          {/* Image URL */}
           <div>
             <label className="block font-semibold text-gray-700 mb-1">Image URL</label>
             <input
               type="url"
               name="imageUrl"
-              required
               value={formData.imageUrl}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded p-2 text-xs focus:outline-none"
+              className={`w-full border rounded p-2 text-xs focus:outline-none ${
+                fieldErrors.imageUrl ? 'border-rose-400 bg-rose-50/50' : 'border-gray-300 focus:border-gray-500'
+              }`}
             />
-            <p className="text-[10px] text-gray-500 mt-1">
-              Cloudinary integration placeholder: Enter direct image URL for v0.1 preview.
-            </p>
+            {fieldErrors.imageUrl ? (
+              <p className="text-rose-600 text-[11px] mt-1 font-medium">{fieldErrors.imageUrl}</p>
+            ) : (
+              <p className="text-[10px] text-gray-500 mt-1">
+                Cloudinary integration placeholder: Enter direct image URL for v0.1 preview.
+              </p>
+            )}
           </div>
 
+          {/* Description */}
           <div>
             <label className="block font-semibold text-gray-700 mb-1">Description</label>
             <textarea
               rows={4}
               name="description"
-              required
               value={formData.description}
               onChange={handleChange}
               placeholder="Describe fit, fabric composition, defect notes, or care instructions..."
-              className="w-full border border-gray-300 rounded p-2 text-xs focus:outline-none"
+              className={`w-full border rounded p-2 text-xs focus:outline-none ${
+                fieldErrors.description ? 'border-rose-400 bg-rose-50/50' : 'border-gray-300 focus:border-gray-500'
+              }`}
             />
+            {fieldErrors.description && (
+              <p className="text-rose-600 text-[11px] mt-1 font-medium">{fieldErrors.description}</p>
+            )}
           </div>
 
+          {/* Tags */}
           <div>
             <label className="block font-semibold text-gray-700 mb-1">Tags (Comma-separated)</label>
             <input
