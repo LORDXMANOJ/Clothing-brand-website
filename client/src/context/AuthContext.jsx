@@ -1,14 +1,19 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { authService } from '../services/authService';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('clothing_swap_user');
+    const saved =
+      localStorage.getItem('clothing_swap_user') || sessionStorage.getItem('clothing_swap_user');
     return saved ? JSON.parse(saved) : null;
   });
-  const [token, setToken] = useState(() => localStorage.getItem('clothing_swap_token'));
+
+  const [token, setToken] = useState(
+    () => localStorage.getItem('clothing_swap_token') || sessionStorage.getItem('clothing_swap_token')
+  );
+
   const [loading, setLoading] = useState(false);
 
   const login = async (credentials) => {

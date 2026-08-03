@@ -7,9 +7,10 @@ const API = axios.create({
   },
 });
 
-// Interceptor to attach JWT token to headers if available
+// Interceptor to attach JWT token to headers if available (checking persistent localStorage or session-based sessionStorage)
 API.interceptors.request.use((config) => {
-  const token = localStorage.getItem('clothing_swap_token');
+  const token =
+    localStorage.getItem('clothing_swap_token') || sessionStorage.getItem('clothing_swap_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

@@ -6,6 +6,7 @@ import { AlertCircle } from 'lucide-react';
 export const LoginPage = () => {
   const [email, setEmail] = useState('marcus@fashionexchange.org');
   const [password, setPassword] = useState('password123');
+  const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState('');
   const { login, loading } = useAuth();
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ export const LoginPage = () => {
     e.preventDefault();
     setError('');
     try {
-      await login({ email, password });
+      await login({ email, password, rememberMe });
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please check credentials.');
@@ -55,6 +56,19 @@ export const LoginPage = () => {
             className="w-full border border-gray-300 rounded p-2 text-xs focus:outline-none focus:border-gray-500"
             placeholder="••••••••"
           />
+        </div>
+
+        {/* Remember Me Checkbox */}
+        <div className="flex items-center justify-between">
+          <label className="flex items-center space-x-2 text-gray-700 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="rounded border-gray-300 text-gray-900 focus:ring-0"
+            />
+            <span className="font-medium text-gray-700">Remember me on this device</span>
+          </label>
         </div>
 
         <button
