@@ -21,11 +21,32 @@ export const RegisterPage = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
 
-    // Clear field-specific error on change
     if (fieldErrors[name]) {
       setFieldErrors({ ...fieldErrors, [name]: '' });
     }
   };
+
+  // Helper function to evaluate password strength
+  const getPasswordStrength = (password) => {
+    if (!password) return { score: 0, label: '', color: '', percent: 0 };
+
+    let score = 0;
+    if (password.length >= 6) score += 1;
+    if (password.length >= 10) score += 1;
+    if (/\d/.test(password)) score += 1;
+    if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score += 1;
+    if (/[^A-Za-z0-9]/.test(password)) score += 1;
+
+    if (score <= 2) {
+      return { score, label: 'Weak', color: 'bg-rose-500', textColors: 'text-rose-600', percent: 33 };
+    } else if (score <= 3) {
+      return { score, label: 'Medium', color: 'bg-amber-500', textColors: 'text-amber-600', percent: 66 };
+    } else {
+      return { score, label: 'Strong', color: 'bg-emerald-500', textColors: 'text-emerald-600', percent: 100 };
+    }
+  };
+
+  const passwordStrength = getPasswordStrength(formData.password);
 
   const validateForm = () => {
     const errors = {};
@@ -141,6 +162,24 @@ export const RegisterPage = () => {
           />
           {fieldErrors.password && (
             <p className="text-rose-600 text-[11px] mt-1 font-medium">{fieldErrors.password}</p>
+          )}
+
+          {/* Password Strength Indicator & Progress Bar */}
+          {formData.password && (
+            <div className="mt-2 space-y-1">
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="text-gray-500 font-medium">Password Strength:</span>
+                <span className={`font-bold ${passwordStrength.textColors}`}>
+                  {passwordStrength.label}
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
+                <div
+                  className={`h-full transition-all duration-300 ${passwordStrength.color}`}
+                  style={{ width: `${passwordStrength.percent}%` }}
+                />
+              </div>
+            </div>
           )}
         </div>
 
