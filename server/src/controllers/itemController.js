@@ -7,7 +7,7 @@ let memoryItems = [...mockItems];
 // @route   GET /api/items
 const getItems = async (req, res) => {
   try {
-    const { category, brand, size, condition, location, search, page = 1, limit = 6 } = req.query;
+    const { category, brand, size, condition, location, search, sortBy, page = 1, limit = 6 } = req.query;
     const pageNum = parseInt(page, 10) || 1;
     const limitNum = parseInt(limit, 10) || 6;
 
@@ -27,8 +27,11 @@ const getItems = async (req, res) => {
         ];
       }
 
+      const sortOptions = sortBy === 'popularity' ? { views: -1 } : { createdAt: -1 };
+
       let items = await ClothingItem.find(query)
         .populate('owner', 'name email avatarUrl location rating')
+        .sort(sortOptions)
         .skip((pageNum - 1) * limitNum)
         .limit(limitNum);
 
@@ -86,6 +89,12 @@ const getItems = async (req, res) => {
       );
     }
 
+    if (sortBy === 'popularity') {
+      filtered.sort((a, b) => (b.views || 0) - (a.views || 0));
+    } else {
+      filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+
     const total = filtered.length;
     const startIndex = (pageNum - 1) * limitNum;
     const paginated = filtered.slice(startIndex, startIndex + limitNum);
@@ -111,6 +120,8 @@ const getItemById = async (req, res) => {
     try {
       const item = await ClothingItem.findById(req.params.id).populate('owner', 'name email avatarUrl location bio rating swapsCompleted');
       if (item) {
+        item.views = (item.views || 0) + 1;
+        await item.save();
         return res.json({ success: true, item });
       }
     } catch (dbErr) {
@@ -121,6 +132,8 @@ const getItemById = async (req, res) => {
     if (!item) {
       return res.status(404).json({ success: false, message: 'Clothing item not found' });
     }
+
+    item.views = (item.views || 0) + 1;
 
     const ownerObj = mockUsers.find((u) => u._id === item.owner) || {
       _id: '66a000000000000000000001',

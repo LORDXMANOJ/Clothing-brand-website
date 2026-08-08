@@ -4,7 +4,7 @@ import { itemService } from '../services/itemService';
 import { swapService } from '../services/swapService';
 import { useAuth } from '../context/AuthContext';
 import { Modal } from '../components/common/Modal';
-import { RefreshCw, MapPin, Tag, ArrowLeft, ShieldCheck, Star } from 'lucide-react';
+import { RefreshCw, MapPin, Tag, ArrowLeft, ShieldCheck, Star, Eye } from 'lucide-react';
 
 export const ItemDetailsPage = () => {
   const { id } = useParams();
@@ -122,9 +122,15 @@ export const ItemDetailsPage = () => {
           <div>
             <div className="flex items-center justify-between">
               <span className="font-bold uppercase tracking-wider text-gray-500 text-[11px]">{item.brand}</span>
-              <span className="bg-gray-100 border border-gray-300 px-2 py-0.5 rounded text-[10px] uppercase font-semibold">
-                {item.condition}
-              </span>
+              <div className="flex items-center space-x-2">
+                <span className="flex items-center space-x-1 text-gray-500 text-[11px]">
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>{item.views || 0} views</span>
+                </span>
+                <span className="bg-gray-100 border border-gray-300 px-2 py-0.5 rounded text-[10px] uppercase font-semibold">
+                  {item.condition}
+                </span>
+              </div>
             </div>
             <h1 className="text-xl font-extrabold text-gray-900 mt-1">{item.title}</h1>
           </div>

@@ -52,6 +52,7 @@ const mockItems = [
     status: 'available',
     tags: ['denim', 'vintage', 'levis', 'jacket'],
     estimatedValue: 85,
+    views: 142,
     createdAt: new Date('2026-07-20T10:00:00Z').toISOString(),
   },
   {
@@ -68,6 +69,7 @@ const mockItems = [
     status: 'available',
     tags: ['summer', 'floral', 'zara', 'dress'],
     estimatedValue: 60,
+    views: 89,
     createdAt: new Date('2026-07-22T14:30:00Z').toISOString(),
   },
   {
@@ -84,6 +86,7 @@ const mockItems = [
     status: 'available',
     tags: ['nike', 'hoodie', 'techfleece', 'sportswear'],
     estimatedValue: 110,
+    views: 215,
     createdAt: new Date('2026-07-25T09:15:00Z').toISOString(),
   },
   {
@@ -100,6 +103,7 @@ const mockItems = [
     status: 'available',
     tags: ['cotton', 'minimalist', 'hm', 'casual'],
     estimatedValue: 35,
+    views: 64,
     createdAt: new Date('2026-07-26T11:20:00Z').toISOString(),
   },
   {
@@ -116,6 +120,7 @@ const mockItems = [
     status: 'available',
     tags: ['uniqlo', 'airism', 'minimal', 'sweatshirt'],
     estimatedValue: 45,
+    views: 178,
     createdAt: new Date('2026-07-27T16:00:00Z').toISOString(),
   },
   {
@@ -132,6 +137,7 @@ const mockItems = [
     status: 'available',
     tags: ['adidas', 'ultraboost', 'sneakers', 'running'],
     estimatedValue: 130,
+    views: 310,
     createdAt: new Date('2026-07-28T08:45:00Z').toISOString(),
   },
 ];

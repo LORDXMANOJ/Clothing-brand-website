@@ -57,6 +57,10 @@ const clothingItemSchema = new mongoose.Schema(
       type: Number,
       default: 50,
     },
+    views: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

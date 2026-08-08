@@ -12,7 +12,7 @@ export const MarketplacePage = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filters, setFilters] = useState({ category: 'All', brand: 'All', size: 'All', condition: 'All', location: 'All' });
+  const [sortBy, setSortBy] = useState('recent');
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -26,7 +26,7 @@ export const MarketplacePage = () => {
   const [swapSuccess, setSwapSuccess] = useState(false);
   const { user, isAuthenticated } = useAuth();
 
-  const fetchItems = async (searchQuery = searchTerm, currentFilters = filters, currentPage = page) => {
+  const fetchItems = async (searchQuery = searchTerm, currentFilters = filters, currentPage = page, currentSort = sortBy) => {
     setLoading(true);
     try {
       const data = await itemService.getItems({
@@ -36,6 +36,7 @@ export const MarketplacePage = () => {
         size: currentFilters.size,
         condition: currentFilters.condition,
         location: currentFilters.location,
+        sortBy: currentSort,
         page: currentPage,
         limit: 6,
       });
@@ -51,11 +52,11 @@ export const MarketplacePage = () => {
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      fetchItems(searchTerm, filters, page);
+      fetchItems(searchTerm, filters, page, sortBy);
     }, 500);
 
     return () => clearTimeout(handler);
-  }, [searchTerm, filters, page]);
+  }, [searchTerm, filters, page, sortBy]);
 
   const handleReset = () => {
     const emptyFilters = { category: 'All', brand: 'All', size: 'All', condition: 'All', location: 'All' };
@@ -124,7 +125,17 @@ export const MarketplacePage = () => {
         <div className="md:col-span-3 space-y-4">
           <div className="flex items-center justify-between text-gray-600 font-semibold border-b border-gray-200 pb-2">
             <span>Showing {items.length} clothing items available</span>
-            <span>Sorted by Recent</span>
+            <div className="flex items-center space-x-1.5">
+              <span className="text-gray-500 font-normal">Sort By:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="border border-gray-300 rounded p-1 text-xs bg-white text-gray-800 focus:outline-none"
+              >
+                <option value="recent">Recent Additions</option>
+                <option value="popularity">Most Popular (Views)</option>
+              </select>
+            </div>
           </div>
 
           {loading ? (
