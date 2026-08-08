@@ -12,7 +12,7 @@ export const MarketplacePage = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filters, setFilters] = useState({ category: 'All', brand: 'All', size: 'All', condition: 'All' });
+  const [filters, setFilters] = useState({ category: 'All', brand: 'All', size: 'All', condition: 'All', location: 'All' });
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -35,6 +35,7 @@ export const MarketplacePage = () => {
         brand: currentFilters.brand,
         size: currentFilters.size,
         condition: currentFilters.condition,
+        location: currentFilters.location,
         page: currentPage,
         limit: 6,
       });
@@ -57,7 +58,7 @@ export const MarketplacePage = () => {
   }, [searchTerm, filters, page]);
 
   const handleReset = () => {
-    const emptyFilters = { category: 'All', brand: 'All', size: 'All', condition: 'All' };
+    const emptyFilters = { category: 'All', brand: 'All', size: 'All', condition: 'All', location: 'All' };
     setSearchTerm('');
     setPage(1);
     setFilters(emptyFilters);

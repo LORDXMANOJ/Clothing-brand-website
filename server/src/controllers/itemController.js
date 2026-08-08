@@ -7,7 +7,7 @@ let memoryItems = [...mockItems];
 // @route   GET /api/items
 const getItems = async (req, res) => {
   try {
-    const { category, brand, size, condition, search, page = 1, limit = 6 } = req.query;
+    const { category, brand, size, condition, location, search, page = 1, limit = 6 } = req.query;
     const pageNum = parseInt(page, 10) || 1;
     const limitNum = parseInt(limit, 10) || 6;
 
@@ -27,11 +27,16 @@ const getItems = async (req, res) => {
         ];
       }
 
-      const total = await ClothingItem.countDocuments(query);
-      const items = await ClothingItem.find(query)
+      let items = await ClothingItem.find(query)
         .populate('owner', 'name email avatarUrl location rating')
         .skip((pageNum - 1) * limitNum)
         .limit(limitNum);
+
+      if (location && location !== 'All') {
+        items = items.filter((i) => i.owner?.location?.toLowerCase().includes(location.toLowerCase()));
+      }
+
+      const total = items.length;
 
       if (items && items.length > 0) {
         return res.json({
@@ -70,6 +75,9 @@ const getItems = async (req, res) => {
     }
     if (condition && condition !== 'All') {
       filtered = filtered.filter((i) => i.condition.toLowerCase() === condition.toLowerCase());
+    }
+    if (location && location !== 'All') {
+      filtered = filtered.filter((i) => i.owner?.location?.toLowerCase().includes(location.toLowerCase()));
     }
     if (search) {
       const q = search.toLowerCase();

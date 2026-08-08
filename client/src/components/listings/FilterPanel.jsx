@@ -6,6 +6,7 @@ export const FilterPanel = ({ filters, setFilters, onReset }) => {
   const sizes = ['All', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'Shoes 8', 'Shoes 9', 'Shoes 10'];
   const conditions = ['All', 'Brand New with Tags', 'Like New', 'Gently Used', 'Fair Condition'];
   const brands = ['All', "Levi's", 'Zara', 'Nike', 'H&M', 'Uniqlo', 'Adidas'];
+  const locations = ['All', 'Brooklyn, NY', 'Austin, TX', 'Seattle, WA', 'New York, NY'];
 
   const handleChange = (field, value) => {
     setFilters({ ...filters, [field]: value });
@@ -79,6 +80,20 @@ export const FilterPanel = ({ filters, setFilters, onReset }) => {
         >
           {conditions.map((cond) => (
             <option key={cond} value={cond}>{cond}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Location */}
+      <div>
+        <label className="block font-semibold text-gray-700 mb-1">Location / City</label>
+        <select
+          value={filters.location || 'All'}
+          onChange={(e) => handleChange('location', e.target.value)}
+          className="w-full border border-gray-300 rounded p-1.5 text-xs bg-white text-gray-800 focus:outline-none"
+        >
+          {locations.map((loc) => (
+            <option key={loc} value={loc}>{loc}</option>
           ))}
         </select>
       </div>
