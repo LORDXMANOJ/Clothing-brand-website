@@ -158,6 +158,9 @@ export const MarketplacePage = () => {
                   onOfferSwap={isAuthenticated ? handleOpenSwapModal : null}
                 />
               ))}
+            </div>
+          )}
+
           {/* Pagination Controls */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between pt-4 border-t border-gray-200 text-xs">
