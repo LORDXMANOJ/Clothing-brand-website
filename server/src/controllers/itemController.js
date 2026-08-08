@@ -7,7 +7,9 @@ let memoryItems = [...mockItems];
 // @route   GET /api/items
 const getItems = async (req, res) => {
   try {
-    const { category, brand, size, condition, search } = req.query;
+    const { category, brand, size, condition, search, page = 1, limit = 6 } = req.query;
+    const pageNum = parseInt(page, 10) || 1;
+    const limitNum = parseInt(limit, 10) || 6;
 
     try {
       let query = { status: 'available' };
@@ -25,9 +27,21 @@ const getItems = async (req, res) => {
         ];
       }
 
-      const items = await ClothingItem.find(query).populate('owner', 'name email avatarUrl location rating');
+      const total = await ClothingItem.countDocuments(query);
+      const items = await ClothingItem.find(query)
+        .populate('owner', 'name email avatarUrl location rating')
+        .skip((pageNum - 1) * limitNum)
+        .limit(limitNum);
+
       if (items && items.length > 0) {
-        return res.json({ success: true, count: items.length, items });
+        return res.json({
+          success: true,
+          count: items.length,
+          total,
+          page: pageNum,
+          pages: Math.ceil(total / limitNum) || 1,
+          items,
+        });
       }
     } catch (dbErr) {
       // Fallback to memoryItems
@@ -64,7 +78,19 @@ const getItems = async (req, res) => {
       );
     }
 
-    res.json({ success: true, count: filtered.length, items: filtered });
+    const total = filtered.length;
+    const startIndex = (pageNum - 1) * limitNum;
+    const paginated = filtered.slice(startIndex, startIndex + limitNum);
+    const pages = Math.ceil(total / limitNum) || 1;
+
+    res.json({
+      success: true,
+      count: paginated.length,
+      total,
+      page: pageNum,
+      pages,
+      items: paginated,
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

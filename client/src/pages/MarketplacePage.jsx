@@ -14,6 +14,10 @@ export const MarketplacePage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({ category: 'All', brand: 'All', size: 'All', condition: 'All' });
 
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
   // Swap Offer Modal state
   const [targetItem, setTargetItem] = useState(null);
   const [userItems, setUserItems] = useState([]);
@@ -22,7 +26,7 @@ export const MarketplacePage = () => {
   const [swapSuccess, setSwapSuccess] = useState(false);
   const { user, isAuthenticated } = useAuth();
 
-  const fetchItems = async (searchQuery = searchTerm, currentFilters = filters) => {
+  const fetchItems = async (searchQuery = searchTerm, currentFilters = filters, currentPage = page) => {
     setLoading(true);
     try {
       const data = await itemService.getItems({
@@ -31,8 +35,12 @@ export const MarketplacePage = () => {
         brand: currentFilters.brand,
         size: currentFilters.size,
         condition: currentFilters.condition,
+        page: currentPage,
+        limit: 6,
       });
       setItems(data.items || []);
+      setTotalPages(data.pages || 1);
+      setTotalItems(data.total || (data.items || []).length);
     } catch (err) {
       console.error('Failed to fetch items:', err);
     } finally {
@@ -42,15 +50,16 @@ export const MarketplacePage = () => {
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      fetchItems(searchTerm, filters);
+      fetchItems(searchTerm, filters, page);
     }, 500);
 
     return () => clearTimeout(handler);
-  }, [searchTerm, filters]);
+  }, [searchTerm, filters, page]);
 
   const handleReset = () => {
     const emptyFilters = { category: 'All', brand: 'All', size: 'All', condition: 'All' };
     setSearchTerm('');
+    setPage(1);
     setFilters(emptyFilters);
   };
 
@@ -137,6 +146,40 @@ export const MarketplacePage = () => {
                   onOfferSwap={isAuthenticated ? handleOpenSwapModal : null}
                 />
               ))}
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between pt-4 border-t border-gray-200 text-xs">
+              <button
+                disabled={page <= 1}
+                onClick={() => setPage(page - 1)}
+                className="border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-40 px-3 py-1.5 rounded font-semibold text-gray-700"
+              >
+                Previous
+              </button>
+
+              <div className="flex items-center space-x-1">
+                {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((pNum) => (
+                  <button
+                    key={pNum}
+                    onClick={() => setPage(pNum)}
+                    className={`px-3 py-1 rounded text-xs font-semibold border ${
+                      pNum === page
+                        ? 'bg-gray-900 text-white border-gray-900'
+                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                    }`}
+                  >
+                    {pNum}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                disabled={page >= totalPages}
+                onClick={() => setPage(page + 1)}
+                className="border border-gray-300 bg-white hover:bg-gray-100 disabled:opacity-40 px-3 py-1.5 rounded font-semibold text-gray-700"
+              >
+                Next
+              </button>
             </div>
           )}
         </div>
