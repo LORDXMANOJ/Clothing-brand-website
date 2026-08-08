@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { itemService } from '../services/itemService';
-import { PlusCircle, Image, Tag, AlertCircle } from 'lucide-react';
+import { PlusCircle, Image, Tag, AlertCircle, HelpCircle, Info } from 'lucide-react';
 
 export const UploadItemPage = () => {
   const [formData, setFormData] = useState({
@@ -20,6 +20,7 @@ export const UploadItemPage = () => {
   const [fieldErrors, setFieldErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showConditionGuide, setShowConditionGuide] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -184,9 +185,21 @@ export const UploadItemPage = () => {
               </select>
             </div>
 
-            {/* Condition */}
-            <div>
-              <label className="block font-semibold text-gray-700 mb-1">Condition</label>
+            {/* Condition & Guide */}
+            <div className="relative">
+              <div className="flex items-center justify-between mb-1">
+                <label className="font-semibold text-gray-700">Condition</label>
+                <button
+                  type="button"
+                  onClick={() => setShowConditionGuide(!showConditionGuide)}
+                  className="text-gray-500 hover:text-gray-900 flex items-center space-x-1 text-[11px]"
+                  title="View Condition Guide"
+                >
+                  <HelpCircle className="w-3.5 h-3.5" />
+                  <span>Guide</span>
+                </button>
+              </div>
+
               <select
                 name="condition"
                 value={formData.condition}
@@ -217,6 +230,22 @@ export const UploadItemPage = () => {
               )}
             </div>
           </div>
+
+          {/* Condition Guide Info Card */}
+          {showConditionGuide && (
+            <div className="bg-gray-50 border border-gray-300 p-3 rounded text-[11px] text-gray-700 space-y-1.5">
+              <div className="flex items-center space-x-1.5 font-bold text-gray-900 border-b border-gray-200 pb-1">
+                <Info className="w-3.5 h-3.5 text-gray-600" />
+                <span>Condition Definitions Guide</span>
+              </div>
+              <ul className="space-y-1 text-gray-600">
+                <li><strong className="text-gray-800">Brand New with Tags:</strong> Never worn, original tags still attached.</li>
+                <li><strong className="text-gray-800">Like New:</strong> Worn once or twice, immaculate condition with no flaws.</li>
+                <li><strong className="text-gray-800">Gently Used:</strong> Worn a few times, minor normal wear but well cared for.</li>
+                <li><strong className="text-gray-800">Fair Condition:</strong> Visible wear or minor cosmetic imperfections noted.</li>
+              </ul>
+            </div>
+          )}
 
           {/* Image URL */}
           <div>

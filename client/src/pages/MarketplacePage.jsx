@@ -22,15 +22,15 @@ export const MarketplacePage = () => {
   const [swapSuccess, setSwapSuccess] = useState(false);
   const { user, isAuthenticated } = useAuth();
 
-  const fetchItems = async () => {
+  const fetchItems = async (searchQuery = searchTerm, currentFilters = filters) => {
     setLoading(true);
     try {
       const data = await itemService.getItems({
-        search: searchTerm,
-        category: filters.category,
-        brand: filters.brand,
-        size: filters.size,
-        condition: filters.condition,
+        search: searchQuery,
+        category: currentFilters.category,
+        brand: currentFilters.brand,
+        size: currentFilters.size,
+        condition: currentFilters.condition,
       });
       setItems(data.items || []);
     } catch (err) {
@@ -41,16 +41,20 @@ export const MarketplacePage = () => {
   };
 
   useEffect(() => {
-    fetchItems();
+    fetchItems(searchTerm, filters);
   }, [filters]);
 
   const handleSearch = (query) => {
-    fetchItems();
+    const q = query !== undefined ? query : searchTerm;
+    setSearchTerm(q);
+    fetchItems(q, filters);
   };
 
   const handleReset = () => {
+    const emptyFilters = { category: 'All', brand: 'All', size: 'All', condition: 'All' };
     setSearchTerm('');
-    setFilters({ category: 'All', brand: 'All', size: 'All', condition: 'All' });
+    setFilters(emptyFilters);
+    fetchItems('', emptyFilters);
   };
 
   const handleOpenSwapModal = async (item) => {
