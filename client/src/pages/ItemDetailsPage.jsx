@@ -263,7 +263,6 @@ export const ItemDetailsPage = () => {
                   </select>
                 )}
               </div>
-
               <div>
                 <label className="block font-semibold text-gray-700 mb-1">Note (Optional)</label>
                 <textarea
@@ -274,7 +273,6 @@ export const ItemDetailsPage = () => {
                   placeholder="Offer notes or shipping questions..."
                 />
               </div>
-
               <div className="flex justify-end space-x-2">
                 <button
                   type="button"
