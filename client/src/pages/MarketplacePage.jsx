@@ -41,20 +41,17 @@ export const MarketplacePage = () => {
   };
 
   useEffect(() => {
-    fetchItems(searchTerm, filters);
-  }, [filters]);
+    const handler = setTimeout(() => {
+      fetchItems(searchTerm, filters);
+    }, 500);
 
-  const handleSearch = (query) => {
-    const q = query !== undefined ? query : searchTerm;
-    setSearchTerm(q);
-    fetchItems(q, filters);
-  };
+    return () => clearTimeout(handler);
+  }, [searchTerm, filters]);
 
   const handleReset = () => {
     const emptyFilters = { category: 'All', brand: 'All', size: 'All', condition: 'All' };
     setSearchTerm('');
     setFilters(emptyFilters);
-    fetchItems('', emptyFilters);
   };
 
   const handleOpenSwapModal = async (item) => {
@@ -103,7 +100,7 @@ export const MarketplacePage = () => {
           <p className="text-gray-500">Discover pre-loved shirts, denim jackets, summer dresses, and hoodies for direct swap.</p>
         </div>
         <div className="w-full md:w-auto">
-          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} onSearch={handleSearch} />
+          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </div>
       </div>
 
