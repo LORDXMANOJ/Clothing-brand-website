@@ -4,11 +4,13 @@ import { itemService } from '../services/itemService';
 import { swapService } from '../services/swapService';
 import { useAuth } from '../context/AuthContext';
 import { Modal } from '../components/common/Modal';
+import { ListingCard } from '../components/listings/ListingCard';
 import { RefreshCw, MapPin, Tag, ArrowLeft, ShieldCheck, Star, Eye } from 'lucide-react';
 
 export const ItemDetailsPage = () => {
   const { id } = useParams();
   const [item, setItem] = useState(null);
+  const [similarItems, setSimilarItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,8 +27,15 @@ export const ItemDetailsPage = () => {
       setLoading(true);
       try {
         const data = await itemService.getItemById(id);
-        setItem(data.item);
-        if (data.item?.images?.[0]) setActiveImage(data.item.images[0]);
+        const currentItem = data.item;
+        setItem(currentItem);
+        if (currentItem?.images?.[0]) setActiveImage(currentItem.images[0]);
+
+        if (currentItem) {
+          const similarData = await itemService.getItems({ category: currentItem.category });
+          const filteredSimilar = (similarData.items || []).filter((i) => i._id !== currentItem._id).slice(0, 3);
+          setSimilarItems(filteredSimilar);
+        }
       } catch (err) {
         console.error('Failed to load item:', err);
       } finally {
@@ -36,7 +45,7 @@ export const ItemDetailsPage = () => {
     fetchItem();
   }, [id]);
 
-  const handleOpenSwapModal = async () => {
+  const handleOpenSwapModal = async (targetOverrideItem) => {
     setIsModalOpen(true);
     try {
       const allData = await itemService.getItems();
@@ -194,7 +203,7 @@ export const ItemDetailsPage = () => {
           {/* Action button */}
           {isAuthenticated ? (
             <button
-              onClick={handleOpenSwapModal}
+              onClick={() => handleOpenSwapModal(item)}
               className="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 rounded flex items-center justify-center space-x-2"
             >
               <RefreshCw className="w-4 h-4" />
@@ -210,6 +219,21 @@ export const ItemDetailsPage = () => {
           )}
         </div>
       </div>
+
+      {/* Similar Items You Might Like Section */}
+      {similarItems.length > 0 && (
+        <div className="bg-white border border-gray-300 rounded p-6 space-y-4">
+          <div className="border-b border-gray-200 pb-3">
+            <h2 className="text-base font-bold text-gray-900">Similar Items You Might Like</h2>
+            <p className="text-gray-500">More {item.category} apparel available for swap in the community</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {similarItems.map((sItem) => (
+              <ListingCard key={sItem._id} item={sItem} onOfferSwap={isAuthenticated ? handleOpenSwapModal : null} />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Swap Modal */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Propose Swap">
