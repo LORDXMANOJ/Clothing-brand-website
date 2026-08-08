@@ -1,5 +1,6 @@
 import React from 'react';
 import { Filter, RotateCcw } from 'lucide-react';
+import { CategoryIcon } from '../../utils/categoryIcons';
 
 export const FilterPanel = ({ filters, setFilters, onReset }) => {
   const categories = ['All', 'Outerwear', 'Dresses', 'Tops', 'Bottoms', 'Footwear', 'Accessories', 'Activewear'];
@@ -30,7 +31,10 @@ export const FilterPanel = ({ filters, setFilters, onReset }) => {
 
       {/* Category */}
       <div>
-        <label className="block font-semibold text-gray-700 mb-1">Category</label>
+        <label className="flex items-center space-x-1.5 font-semibold text-gray-700 mb-1">
+          {filters.category && filters.category !== 'All' && <CategoryIcon category={filters.category} className="w-3.5 h-3.5 text-gray-600" />}
+          <span>Category</span>
+        </label>
         <select
           value={filters.category || 'All'}
           onChange={(e) => handleChange('category', e.target.value)}
